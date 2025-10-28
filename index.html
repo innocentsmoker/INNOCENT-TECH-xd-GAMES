@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f0c29">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Neon Rush: Street Runner</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         * {
             margin: 0;
@@ -98,11 +102,15 @@
         }
         
         .creator {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             color: #33ff99;
             margin-bottom: 30px;
             text-shadow: 0 0 10px rgba(51, 255, 153, 0.7);
             animation: glow 3s infinite alternate;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(51, 255, 153, 0.3);
         }
         
         @keyframes glow {
@@ -287,6 +295,67 @@
             z-index: 10;
         }
         
+        #installButton {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 30, 70, 0.8);
+            border: 2px solid rgba(100, 100, 255, 0.5);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            pointer-events: auto;
+            display: none;
+            z-index: 10;
+        }
+        
+        .progress-bar {
+            width: 80%;
+            height: 20px;
+            background: rgba(30, 30, 70, 0.8);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff00cc, #3333ff);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            width: 90%;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            color: #33ff99;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #a0a0e0;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5rem;
@@ -332,6 +401,7 @@
         
         <div id="uiOverlay">
             <div id="scoreDisplay">Score: 0</div>
+            <button id="installButton">INSTALL APP</button>
             <button id="realityToggle">REALITY<br>VIEW</button>
             
             <div id="mobileControls">
@@ -364,11 +434,31 @@
         
         <div id="startScreen" class="screen">
             <h1>NEON RUSH</h1>
-            <div class="creator">Created by Alex</div>
+            <div class="creator">Created by INNOCENT TECH</div>
             <h2>A Cyberpunk Street Runner</h2>
             <p>In the sprawling metropolis of Neo-Kyoto, you are Kaito, a runner who can see through the corporate "Mirage" to the gritty reality beneath. Outrun the Sanitizers, hack the system, and expose the truth!</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="highScore">0</div>
+                    <div class="stat-label">HIGH SCORE</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalGames">0</div>
+                    <div class="stat-label">GAMES PLAYED</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalDistance">0</div>
+                    <div class="stat-label">DISTANCE</div>
+                </div>
+            </div>
+            
             <button class="button" id="startButton">START RUN</button>
             <p class="instructions">Use the directional buttons to move, JUMP to avoid obstacles, SLIDE under barriers, and HACK to toggle reality view.</p>
+            
+            <div class="progress-bar" id="loadingBar">
+                <div class="progress-fill" id="loadingFill"></div>
+            </div>
         </div>
         
         <div id="gameScreen" class="screen">
@@ -388,6 +478,7 @@
         let canvas, ctx;
         let gameActive = false;
         let score = 0;
+        let distance = 0;
         let player;
         let obstacles = [];
         let collectibles = [];
@@ -399,10 +490,16 @@
         let keys = {};
         let touchControls = {};
         let soundEnabled = true;
+        let musicEnabled = true;
+        let highScore = 0;
+        let totalGames = 0;
+        let totalDistance = 0;
+        let deferredPrompt;
         
         // Audio context for sound effects
         let audioContext;
         let sounds = {};
+        let backgroundMusic;
         
         // Player object
         const playerConfig = {
@@ -425,6 +522,9 @@
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
             
+            // Load saved data
+            loadGameData();
+            
             // Set canvas size to match window
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
@@ -435,8 +535,29 @@
             // Set up event listeners
             setupEventListeners();
             
+            // Show install button if PWA is available
+            setupPWA();
+            
             // Start the game loop
             requestAnimationFrame(gameLoop);
+        }
+        
+        // Load saved game data
+        function loadGameData() {
+            highScore = localStorage.getItem('neonRushHighScore') || 0;
+            totalGames = localStorage.getItem('neonRushTotalGames') || 0;
+            totalDistance = localStorage.getItem('neonRushTotalDistance') || 0;
+            
+            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('totalGames').textContent = totalGames;
+            document.getElementById('totalDistance').textContent = totalDistance;
+        }
+        
+        // Save game data
+        function saveGameData() {
+            localStorage.setItem('neonRushHighScore', highScore);
+            localStorage.setItem('neonRushTotalGames', totalGames);
+            localStorage.setItem('neonRushTotalDistance', totalDistance);
         }
         
         // Initialize audio system
@@ -451,11 +572,14 @@
                 sounds.collision = createSound(150, 0.3, 'sawtooth', 0.3);
                 sounds.hack = createSound(600, 0.1, 'sine', 0.2);
                 sounds.realityToggle = createSound(400, 0.1, 'triangle', 0.1);
-                sounds.background = createBackgroundSound();
+                
+                // Create background music
+                createBackgroundMusic();
                 
             } catch (e) {
                 console.log("Web Audio API is not supported in this browser");
                 soundEnabled = false;
+                musicEnabled = false;
                 document.getElementById('soundToggle').style.display = 'none';
             }
         }
@@ -482,31 +606,67 @@
             };
         }
         
-        // Create background ambient sound
-        function createBackgroundSound() {
-            return function() {
-                if (!soundEnabled) return;
+        // Create background music
+        function createBackgroundMusic() {
+            if (!musicEnabled) return;
+            
+            // Create a synthwave-style background music
+            const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25]; // C Major scale
+            let currentNote = 0;
+            
+            function playNote() {
+                if (!musicEnabled) return;
                 
-                // Create a low-frequency oscillator for ambient sound
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 
-                oscillator.frequency.setValueAtTime(110, audioContext.currentTime);
-                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(notes[currentNote], audioContext.currentTime);
+                oscillator.type = 'sawtooth';
                 
-                gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
+                // Create a pulsing effect
+                gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
                 
                 oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
                 
-                // Return function to stop the sound
-                return function() {
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
-                    oscillator.stop(audioContext.currentTime + 1);
-                };
-            };
+                // Move to next note
+                currentNote = (currentNote + 1) % notes.length;
+                
+                // Schedule next note
+                setTimeout(playNote, 600);
+            }
+            
+            // Start the music
+            playNote();
+        }
+        
+        // Setup PWA install prompt
+        function setupPWA() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault();
+                // Stash the event so it can be triggered later
+                deferredPrompt = e;
+                // Show the install button
+                document.getElementById('installButton').style.display = 'block';
+            });
+            
+            document.getElementById('installButton').addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    // Show the install prompt
+                    deferredPrompt.prompt();
+                    // Wait for the user to respond to the prompt
+                    const { outcome } = await deferredPrompt.userChoice;
+                    // We've used the prompt, and can't use it again, discard it
+                    deferredPrompt = null;
+                    // Hide the install button
+                    document.getElementById('installButton').style.display = 'none';
+                }
+            });
         }
         
         // Resize canvas to fit window
@@ -572,6 +732,7 @@
         // Toggle sound on/off
         function toggleSound() {
             soundEnabled = !soundEnabled;
+            musicEnabled = !musicEnabled;
             const soundToggle = document.getElementById('soundToggle');
             soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
             
@@ -584,11 +745,13 @@
         function startGame() {
             gameActive = true;
             score = 0;
+            distance = 0;
             player = {...playerConfig};
             obstacles = [];
             collectibles = [];
             sanitizers = [];
             lastObstacleTime = 0;
+            gameSpeed = 5;
             
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'none';
@@ -596,18 +759,14 @@
             
             updateScore();
             
-            // Start background sound if enabled
-            if (soundEnabled && sounds.background) {
-                sounds.backgroundStop = sounds.background();
-            }
+            // Increment games played
+            totalGames++;
+            document.getElementById('totalGames').textContent = totalGames;
+            saveGameData();
         }
         
         // Restart the game
         function restartGame() {
-            // Stop background sound if playing
-            if (sounds.backgroundStop) {
-                sounds.backgroundStop();
-            }
             startGame();
         }
         
@@ -617,13 +776,21 @@
             document.getElementById('finalScore').textContent = `Score: ${score}`;
             document.getElementById('gameOverScreen').style.display = 'flex';
             
+            // Update high score if needed
+            if (score > highScore) {
+                highScore = score;
+                document.getElementById('highScore').textContent = highScore;
+            }
+            
+            // Update total distance
+            totalDistance += Math.floor(distance);
+            document.getElementById('totalDistance').textContent = totalDistance;
+            
+            // Save game data
+            saveGameData();
+            
             // Play collision sound
             if (sounds.collision) sounds.collision();
-            
-            // Stop background sound
-            if (sounds.backgroundStop) {
-                sounds.backgroundStop();
-            }
         }
         
         // Update score display
@@ -672,6 +839,9 @@
             } else {
                 player.height = 60;
             }
+            
+            // Increase distance
+            distance += gameSpeed / 100;
             
             // Generate obstacles
             const currentTime = Date.now();
@@ -922,6 +1092,11 @@
                 ctx.fillStyle = '#33CCFF';
                 ctx.font = 'italic 18px Arial';
                 ctx.fillText('SYNTHETIC PARADISE', canvas.width - 200, 130);
+                
+                // Draw INNOCENT TECH logo
+                ctx.fillStyle = '#33FF99';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText('INNOCENT TECH', 20, canvas.height - 30);
             }
         }
         
@@ -1053,10 +1228,27 @@
             ctx.fillText(`REALITY_VIEW: ACTIVE`, 20, 50);
             ctx.fillText(`OMNIGEN_SYS: BREACHED`, 20, 70);
             ctx.fillText(`PLAYER: KAITO`, 20, 90);
+            ctx.fillText(`DEV: INNOCENT TECH`, 20, 110);
         }
         
         // Initialize the game when the page loads
         window.addEventListener('load', init);
+    </script>
+    
+    <!-- PWA Manifest -->
+    <script>
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
