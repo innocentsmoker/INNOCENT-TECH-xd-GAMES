@@ -61,9 +61,11 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(10, 10, 40, 0.9);
+            background: rgba(10, 10, 40, 0.95);
             z-index: 3;
             transition: opacity 0.5s;
+            padding: 20px;
+            text-align: center;
         }
         
         #gameScreen {
@@ -71,8 +73,7 @@
         }
         
         #startScreen {
-            padding: 20px;
-            text-align: center;
+            background: linear-gradient(135deg, rgba(15, 12, 41, 0.9), rgba(48, 43, 99, 0.9), rgba(36, 36, 62, 0.9));
         }
         
         #gameOverScreen {
@@ -80,19 +81,40 @@
         }
         
         h1 {
-            font-size: 3rem;
-            background: linear-gradient(90deg, #ff00cc, #3333ff);
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, #ff00cc, #3333ff, #00ffff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 0 10px rgba(255, 0, 204, 0.5);
-            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 0, 204, 0.7);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .creator {
+            font-size: 1.2rem;
+            color: #33ff99;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(51, 255, 153, 0.7);
+            animation: glow 3s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px rgba(51, 255, 153, 0.7); }
+            to { text-shadow: 0 0 15px rgba(51, 255, 153, 1), 0 0 20px rgba(51, 255, 153, 0.7); }
         }
         
         h2 {
             color: #ffcc00;
             margin-bottom: 20px;
             font-size: 1.8rem;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
         }
         
         p {
@@ -131,14 +153,18 @@
             color: #33ff99;
             text-shadow: 0 0 5px rgba(51, 255, 153, 0.7);
             pointer-events: none;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(51, 255, 153, 0.3);
         }
         
         #realityToggle {
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             background: linear-gradient(135deg, #ff00cc, #3333ff);
             border: 2px solid white;
@@ -151,7 +177,8 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            box-shadow: 0 0 10px rgba(255, 0, 204, 0.7);
+            box-shadow: 0 0 15px rgba(255, 0, 204, 0.7);
+            z-index: 10;
         }
         
         #mobileControls {
@@ -183,7 +210,7 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background: rgba(30, 30, 70, 0.7);
+            background: rgba(30, 30, 70, 0.8);
             border: 2px solid rgba(100, 100, 255, 0.5);
             color: white;
             font-size: 1.5rem;
@@ -194,17 +221,19 @@
             cursor: pointer;
             pointer-events: auto;
             box-shadow: 0 0 10px rgba(100, 100, 255, 0.3);
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
             touch-action: manipulation;
         }
         
         .controlButton:active {
             background: rgba(50, 50, 120, 0.9);
+            transform: scale(0.9);
         }
         
         #jumpButton {
             background: rgba(255, 0, 204, 0.7);
             border-color: rgba(255, 100, 200, 0.8);
+            box-shadow: 0 0 15px rgba(255, 0, 204, 0.5);
         }
         
         #jumpButton:active {
@@ -214,6 +243,7 @@
         #slideButton {
             background: rgba(51, 204, 255, 0.7);
             border-color: rgba(100, 200, 255, 0.8);
+            box-shadow: 0 0 15px rgba(51, 204, 255, 0.5);
         }
         
         #slideButton:active {
@@ -223,6 +253,7 @@
         #hackButton {
             background: rgba(51, 255, 153, 0.7);
             border-color: rgba(100, 255, 180, 0.8);
+            box-shadow: 0 0 15px rgba(51, 255, 153, 0.5);
         }
         
         #hackButton:active {
@@ -237,6 +268,25 @@
             max-width: 90%;
         }
         
+        .sound-toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(30, 30, 70, 0.8);
+            border: 2px solid rgba(100, 100, 255, 0.5);
+            color: white;
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            pointer-events: auto;
+            z-index: 10;
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5rem;
@@ -246,6 +296,12 @@
                 width: 60px;
                 height: 60px;
                 font-size: 1.2rem;
+            }
+            
+            #realityToggle {
+                width: 60px;
+                height: 60px;
+                font-size: 0.7rem;
             }
         }
         
@@ -258,6 +314,14 @@
             
             #mobileControls {
                 bottom: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .creator {
+                font-size: 1rem;
             }
         }
     </style>
@@ -294,10 +358,13 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="sound-toggle" id="soundToggle">🔊</div>
         </div>
         
         <div id="startScreen" class="screen">
             <h1>NEON RUSH</h1>
+            <div class="creator">Created by Alex</div>
             <h2>A Cyberpunk Street Runner</h2>
             <p>In the sprawling metropolis of Neo-Kyoto, you are Kaito, a runner who can see through the corporate "Mirage" to the gritty reality beneath. Outrun the Sanitizers, hack the system, and expose the truth!</p>
             <button class="button" id="startButton">START RUN</button>
@@ -331,6 +398,11 @@
         let obstacleInterval = 1500;
         let keys = {};
         let touchControls = {};
+        let soundEnabled = true;
+        
+        // Audio context for sound effects
+        let audioContext;
+        let sounds = {};
         
         // Player object
         const playerConfig = {
@@ -357,11 +429,84 @@
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
             
+            // Initialize audio
+            initAudio();
+            
             // Set up event listeners
             setupEventListeners();
             
             // Start the game loop
             requestAnimationFrame(gameLoop);
+        }
+        
+        // Initialize audio system
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create sound effects
+                sounds.jump = createSound(200, 0.2, 'sawtooth', 0.1);
+                sounds.slide = createSound(100, 0.15, 'square', 0.2);
+                sounds.collect = createSound(800, 0.1, 'sine', 0.05);
+                sounds.collision = createSound(150, 0.3, 'sawtooth', 0.3);
+                sounds.hack = createSound(600, 0.1, 'sine', 0.2);
+                sounds.realityToggle = createSound(400, 0.1, 'triangle', 0.1);
+                sounds.background = createBackgroundSound();
+                
+            } catch (e) {
+                console.log("Web Audio API is not supported in this browser");
+                soundEnabled = false;
+                document.getElementById('soundToggle').style.display = 'none';
+            }
+        }
+        
+        // Create a simple sound using oscillators
+        function createSound(frequency, duration, type, volume) {
+            return function() {
+                if (!soundEnabled) return;
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            };
+        }
+        
+        // Create background ambient sound
+        function createBackgroundSound() {
+            return function() {
+                if (!soundEnabled) return;
+                
+                // Create a low-frequency oscillator for ambient sound
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(110, audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
+                
+                oscillator.start(audioContext.currentTime);
+                
+                // Return function to stop the sound
+                return function() {
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
+                    oscillator.stop(audioContext.currentTime + 1);
+                };
+            };
         }
         
         // Resize canvas to fit window
@@ -402,6 +547,7 @@
                     // Special handling for hack button (reality toggle)
                     if (buttonId === 'hackButton') {
                         realityView = !realityView;
+                        if (sounds.realityToggle) sounds.realityToggle();
                     }
                 });
                 
@@ -416,7 +562,22 @@
             document.getElementById('restartButton').addEventListener('click', restartGame);
             document.getElementById('realityToggle').addEventListener('click', () => {
                 realityView = !realityView;
+                if (sounds.realityToggle) sounds.realityToggle();
             });
+            
+            // Sound toggle
+            document.getElementById('soundToggle').addEventListener('click', toggleSound);
+        }
+        
+        // Toggle sound on/off
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const soundToggle = document.getElementById('soundToggle');
+            soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+            
+            if (soundEnabled && audioContext) {
+                audioContext.resume();
+            }
         }
         
         // Start the game
@@ -434,10 +595,19 @@
             document.getElementById('gameOverScreen').style.display = 'none';
             
             updateScore();
+            
+            // Start background sound if enabled
+            if (soundEnabled && sounds.background) {
+                sounds.backgroundStop = sounds.background();
+            }
         }
         
         // Restart the game
         function restartGame() {
+            // Stop background sound if playing
+            if (sounds.backgroundStop) {
+                sounds.backgroundStop();
+            }
             startGame();
         }
         
@@ -446,6 +616,14 @@
             gameActive = false;
             document.getElementById('finalScore').textContent = `Score: ${score}`;
             document.getElementById('gameOverScreen').style.display = 'flex';
+            
+            // Play collision sound
+            if (sounds.collision) sounds.collision();
+            
+            // Stop background sound
+            if (sounds.backgroundStop) {
+                sounds.backgroundStop();
+            }
         }
         
         // Update score display
@@ -537,6 +715,7 @@
                     collectibles.splice(i, 1);
                     score += 50;
                     updateScore();
+                    if (sounds.collect) sounds.collect();
                 }
             }
             
@@ -570,11 +749,13 @@
             if ((keys['ArrowUp'] || keys['w'] || keys['W'] || keys[' '] || touchControls['upButton'] || touchControls['jumpButton']) && !player.isJumping) {
                 player.isJumping = true;
                 player.velocityY = -player.jumpPower;
+                if (sounds.jump) sounds.jump();
             }
             
             if ((keys['ArrowDown'] || keys['s'] || keys['S'] || touchControls['downButton'] || touchControls['slideButton']) && !player.isSliding && !player.isJumping) {
                 player.isSliding = true;
                 player.slideTime = 0;
+                if (sounds.slide) sounds.slide();
             }
             
             if (keys['Tab'] || keys['e'] || keys['E'] || touchControls['hackButton']) {
@@ -594,7 +775,8 @@
                         y: 240,
                         width: 30,
                         height: 120,
-                        type: 'barrier'
+                        type: 'barrier',
+                        color: realityView ? '#8B4513' : '#FF4444' // Brown in reality, Red in mirage
                     });
                     break;
                     
@@ -605,7 +787,8 @@
                         y: 360,
                         width: 80,
                         height: 10,
-                        type: 'gap'
+                        type: 'gap',
+                        color: realityView ? '#2F4F4F' : '#4444FF' // Dark slate in reality, Blue in mirage
                     });
                     break;
                     
@@ -615,7 +798,8 @@
                         y: 300,
                         width: 40,
                         height: 60,
-                        type: 'lowBarrier'
+                        type: 'lowBarrier',
+                        color: realityView ? '#696969' : '#FFAA00' // Dim gray in reality, Orange in mirage
                     });
                     break;
                     
@@ -625,7 +809,9 @@
                         y: 280,
                         width: 40,
                         height: 80,
-                        type: 'sanitizer'
+                        type: 'sanitizer',
+                        color: realityView ? '#2F2F2F' : '#4444FF', // Dark gray in reality, Blue in mirage
+                        detailColor: realityView ? '#5D5D5D' : '#FF00CC' // Gray in reality, Pink in mirage
                     });
                     break;
                     
@@ -635,7 +821,8 @@
                         y: 250,
                         width: 30,
                         height: 30,
-                        type: 'dataNode'
+                        type: 'dataNode',
+                        color: realityView ? '#1E90FF' : '#FF00CC' // Dodger blue in reality, Pink in mirage
                     });
                     break;
             }
@@ -725,46 +912,77 @@
                     }
                 }
             }
+            
+            // Draw neon signs in mirage view
+            if (!realityView) {
+                ctx.fillStyle = '#FF00CC';
+                ctx.font = 'italic 20px Arial';
+                ctx.fillText('OMNIGEN', canvas.width - 150, 100);
+                
+                ctx.fillStyle = '#33CCFF';
+                ctx.font = 'italic 18px Arial';
+                ctx.fillText('SYNTHETIC PARADISE', canvas.width - 200, 130);
+            }
         }
         
         // Draw the player character
         function drawPlayer() {
-            ctx.fillStyle = realityView ? '#cccccc' : '#33ff99';
+            const playerColor = realityView ? '#CCCCCC' : '#33FF99';
+            ctx.fillStyle = playerColor;
             ctx.fillRect(player.x, player.y, player.width, player.height);
             
             // Draw player details
-            ctx.fillStyle = realityView ? '#333333' : '#ff00cc';
+            const detailColor = realityView ? '#333333' : '#FF00CC';
+            ctx.fillStyle = detailColor;
             ctx.fillRect(player.x + 5, player.y + 5, player.width - 10, 10);
             
             if (player.isSliding) {
-                ctx.fillStyle = realityView ? '#666666' : '#ffcc00';
+                const slideColor = realityView ? '#666666' : '#FFCC00';
+                ctx.fillStyle = slideColor;
                 ctx.fillRect(player.x, player.y + player.height - 5, player.width, 5);
+            }
+            
+            // Add player glow effect in mirage view
+            if (!realityView) {
+                ctx.fillStyle = 'rgba(51, 255, 153, 0.2)';
+                ctx.fillRect(player.x - 5, player.y - 5, player.width + 10, player.height + 10);
             }
         }
         
         // Draw an obstacle
         function drawObstacle(obstacle) {
+            ctx.fillStyle = obstacle.color;
+            
             switch(obstacle.type) {
                 case 'barrier':
-                    ctx.fillStyle = realityView ? '#555555' : '#ff6666';
                     ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                    // Add details
+                    ctx.fillStyle = realityView ? '#5D4037' : '#FF7777';
+                    ctx.fillRect(obstacle.x + 5, obstacle.y + 5, obstacle.width - 10, 10);
                     break;
                     
                 case 'gap':
-                    ctx.fillStyle = realityView ? '#1a1a1a' : '#0f0c29';
                     ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
                     break;
                     
                 case 'lowBarrier':
-                    ctx.fillStyle = realityView ? '#555555' : '#ffcc00';
                     ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                    // Add warning stripes in mirage view
+                    if (!realityView) {
+                        ctx.fillStyle = '#FFDD00';
+                        for (let i = 0; i < obstacle.width; i += 10) {
+                            if (i % 20 === 0) {
+                                ctx.fillRect(obstacle.x + i, obstacle.y, 5, obstacle.height);
+                            }
+                        }
+                    }
                     break;
             }
         }
         
         // Draw a collectible
         function drawCollectible(collectible) {
-            ctx.fillStyle = realityView ? '#33ccff' : '#ff00cc';
+            ctx.fillStyle = collectible.color;
             ctx.beginPath();
             ctx.arc(
                 collectible.x + collectible.width / 2,
@@ -776,7 +994,8 @@
             ctx.fill();
             
             // Add a glow effect
-            ctx.fillStyle = realityView ? 'rgba(51, 204, 255, 0.3)' : 'rgba(255, 0, 204, 0.3)';
+            const glowColor = realityView ? 'rgba(30, 144, 255, 0.3)' : 'rgba(255, 0, 204, 0.3)';
+            ctx.fillStyle = glowColor;
             ctx.beginPath();
             ctx.arc(
                 collectible.x + collectible.width / 2,
@@ -786,20 +1005,33 @@
                 Math.PI * 2
             );
             ctx.fill();
+            
+            // Add data node symbol
+            ctx.fillStyle = realityView ? '#FFFFFF' : '#FFFFFF';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('DATA', collectible.x + 5, collectible.y + 18);
         }
         
         // Draw a sanitizer
         function drawSanitizer(sanitizer) {
-            ctx.fillStyle = realityView ? '#333333' : '#3333ff';
+            ctx.fillStyle = sanitizer.color;
             ctx.fillRect(sanitizer.x, sanitizer.y, sanitizer.width, sanitizer.height);
             
             // Draw details
-            ctx.fillStyle = realityView ? '#666666' : '#ff00cc';
+            ctx.fillStyle = sanitizer.detailColor;
             ctx.fillRect(sanitizer.x + 5, sanitizer.y + 10, sanitizer.width - 10, 15);
             
             // Draw scanning beam
-            ctx.fillStyle = realityView ? 'rgba(100, 100, 100, 0.5)' : 'rgba(255, 0, 204, 0.3)';
+            const beamColor = realityView ? 'rgba(100, 100, 100, 0.5)' : 'rgba(255, 0, 204, 0.3)';
+            ctx.fillStyle = beamColor;
             ctx.fillRect(sanitizer.x - 50, sanitizer.y + 40, 50, 5);
+            
+            // Add OmniGen logo in mirage view
+            if (!realityView) {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '10px Arial';
+                ctx.fillText('OG', sanitizer.x + 15, sanitizer.y + 25);
+            }
         }
         
         // Draw reality overlay
@@ -820,6 +1052,7 @@
             ctx.fillText(`DATA_STREAM: ${score}`, 20, 30);
             ctx.fillText(`REALITY_VIEW: ACTIVE`, 20, 50);
             ctx.fillText(`OMNIGEN_SYS: BREACHED`, 20, 70);
+            ctx.fillText(`PLAYER: KAITO`, 20, 90);
         }
         
         // Initialize the game when the page loads
