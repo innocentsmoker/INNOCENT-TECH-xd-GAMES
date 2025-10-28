@@ -2,385 +2,828 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neon Rush: Street Runner</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
         body {
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: #fff;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        #uiOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(10, 10, 40, 0.9);
+            z-index: 3;
+            transition: opacity 0.5s;
+        }
+        
+        #gameScreen {
+            display: none;
+        }
+        
+        #startScreen {
             padding: 20px;
+            text-align: center;
         }
         
-        header {
-            text-align: center;
-            padding: 30px 0;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 40px;
+        #gameOverScreen {
+            display: none;
         }
         
         h1 {
-            font-size: 3.5rem;
+            font-size: 3rem;
             background: linear-gradient(90deg, #ff00cc, #3333ff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             text-shadow: 0 0 10px rgba(255, 0, 204, 0.5);
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            color: #a0a0e0;
             margin-bottom: 20px;
         }
         
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            background: rgba(0, 0, 30, 0.6);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid rgba(100, 100, 255, 0.3);
-            box-shadow: 0 0 15px rgba(100, 100, 255, 0.2);
+        h2 {
+            color: #ffcc00;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
         }
         
-        .info-section {
-            flex: 1;
-            padding: 0 20px;
-        }
-        
-        .info-section h2 {
-            color: #ff00cc;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-            border-bottom: 1px solid rgba(255, 0, 204, 0.3);
-            padding-bottom: 5px;
-        }
-        
-        .info-section p {
+        p {
             line-height: 1.6;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: #e0e0ff;
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        
-        .feature-card {
-            background: rgba(20, 20, 50, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid rgba(100, 100, 255, 0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .feature-card h3 {
-            color: #33ccff;
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-        }
-        
-        .feature-card p {
-            color: #c0c0ff;
-            line-height: 1.5;
-        }
-        
-        .gameplay-section {
-            background: rgba(10, 10, 40, 0.8);
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(100, 100, 255, 0.3);
-        }
-        
-        .gameplay-section h2 {
+            max-width: 90%;
             text-align: center;
-            color: #ffcc00;
-            margin-bottom: 20px;
-            font-size: 2rem;
         }
         
-        .controls {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-top: 30px;
-        }
-        
-        .control-item {
-            text-align: center;
-            margin: 10px;
-            padding: 15px;
-            background: rgba(30, 30, 70, 0.8);
-            border-radius: 8px;
-            min-width: 150px;
-        }
-        
-        .control-item .key {
-            display: inline-block;
-            background: #333;
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            font-weight: bold;
-            border: 1px solid #555;
-        }
-        
-        .character-section {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-        }
-        
-        .character {
-            text-align: center;
-            margin: 15px;
-            padding: 20px;
-            background: rgba(20, 20, 50, 0.7);
-            border-radius: 10px;
-            width: 250px;
-            border: 1px solid rgba(100, 100, 255, 0.3);
-        }
-        
-        .character-img {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #ff00cc, #3333ff);
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-        }
-        
-        .character h3 {
-            color: #33ff99;
-            margin-bottom: 10px;
-        }
-        
-        .upgrade-system {
-            background: rgba(10, 10, 40, 0.8);
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(100, 100, 255, 0.3);
-        }
-        
-        .upgrade-system h2 {
-            text-align: center;
-            color: #ff6666;
-            margin-bottom: 20px;
-            font-size: 2rem;
-        }
-        
-        .upgrades {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .upgrade {
-            background: rgba(30, 30, 70, 0.8);
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #ff00cc;
-        }
-        
-        .upgrade h3 {
-            color: #ffcc00;
-            margin-bottom: 10px;
-        }
-        
-        .cta-section {
-            text-align: center;
-            padding: 40px 20px;
-            background: rgba(0, 0, 30, 0.6);
-            border-radius: 10px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(100, 100, 255, 0.3);
-        }
-        
-        .cta-button {
-            display: inline-block;
+        .button {
             background: linear-gradient(90deg, #ff00cc, #3333ff);
             color: white;
-            padding: 15px 40px;
+            border: none;
+            padding: 15px 30px;
             border-radius: 30px;
-            text-decoration: none;
             font-size: 1.2rem;
             font-weight: bold;
-            margin-top: 20px;
-            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+            cursor: pointer;
+            pointer-events: auto;
             box-shadow: 0 5px 15px rgba(255, 0, 204, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 0, 204, 0.6);
+        .button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 10px rgba(255, 0, 204, 0.6);
         }
         
-        footer {
+        #scoreDisplay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.5rem;
+            color: #33ff99;
+            text-shadow: 0 0 5px rgba(51, 255, 153, 0.7);
+            pointer-events: none;
+        }
+        
+        #realityToggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff00cc, #3333ff);
+            border: 2px solid white;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            pointer-events: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            padding: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 40px;
+            box-shadow: 0 0 10px rgba(255, 0, 204, 0.7);
+        }
+        
+        #mobileControls {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            pointer-events: none;
+        }
+        
+        .controlGroup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+        
+        .controlRow {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+            pointer-events: none;
+        }
+        
+        .controlButton {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(30, 30, 70, 0.7);
+            border: 2px solid rgba(100, 100, 255, 0.5);
+            color: white;
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 0 10px rgba(100, 100, 255, 0.3);
+            transition: background 0.2s;
+            touch-action: manipulation;
+        }
+        
+        .controlButton:active {
+            background: rgba(50, 50, 120, 0.9);
+        }
+        
+        #jumpButton {
+            background: rgba(255, 0, 204, 0.7);
+            border-color: rgba(255, 100, 200, 0.8);
+        }
+        
+        #jumpButton:active {
+            background: rgba(255, 50, 180, 0.9);
+        }
+        
+        #slideButton {
+            background: rgba(51, 204, 255, 0.7);
+            border-color: rgba(100, 200, 255, 0.8);
+        }
+        
+        #slideButton:active {
+            background: rgba(80, 180, 255, 0.9);
+        }
+        
+        #hackButton {
+            background: rgba(51, 255, 153, 0.7);
+            border-color: rgba(100, 255, 180, 0.8);
+        }
+        
+        #hackButton:active {
+            background: rgba(80, 255, 160, 0.9);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            font-size: 0.9rem;
             color: #a0a0e0;
+            text-align: center;
+            max-width: 90%;
         }
         
         @media (max-width: 768px) {
-            .game-info {
-                flex-direction: column;
-            }
-            
-            .info-section {
-                margin-bottom: 20px;
-            }
-            
             h1 {
                 font-size: 2.5rem;
+            }
+            
+            .controlButton {
+                width: 60px;
+                height: 60px;
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            .controlButton {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+            
+            #mobileControls {
+                bottom: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="uiOverlay">
+            <div id="scoreDisplay">Score: 0</div>
+            <button id="realityToggle">REALITY<br>VIEW</button>
+            
+            <div id="mobileControls">
+                <div class="controlGroup">
+                    <div class="controlRow">
+                        <div class="controlButton" id="leftButton">←</div>
+                    </div>
+                    <div class="controlRow">
+                        <div class="controlButton" id="downButton">↓</div>
+                        <div class="controlButton" id="upButton">↑</div>
+                    </div>
+                    <div class="controlRow">
+                        <div class="controlButton" id="rightButton">→</div>
+                    </div>
+                </div>
+                
+                <div class="controlGroup">
+                    <div class="controlRow">
+                        <div class="controlButton" id="jumpButton">JUMP</div>
+                    </div>
+                    <div class="controlRow">
+                        <div class="controlButton" id="slideButton">SLIDE</div>
+                        <div class="controlButton" id="hackButton">HACK</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="startScreen" class="screen">
             <h1>NEON RUSH</h1>
-            <p class="subtitle">A Cyberpunk Street Runner Experience</p>
-        </header>
+            <h2>A Cyberpunk Street Runner</h2>
+            <p>In the sprawling metropolis of Neo-Kyoto, you are Kaito, a runner who can see through the corporate "Mirage" to the gritty reality beneath. Outrun the Sanitizers, hack the system, and expose the truth!</p>
+            <button class="button" id="startButton">START RUN</button>
+            <p class="instructions">Use the directional buttons to move, JUMP to avoid obstacles, SLIDE under barriers, and HACK to toggle reality view.</p>
+        </div>
         
-        <section class="game-info">
-            <div class="info-section">
-                <h2>The World</h2>
-                <p>In the sprawling, rain-slicked metropolis of Neo-Kyoto, you are Kaito, a disillusioned corporate drone who discovers a secret: the city is a lie. A powerful corporation, OmniGen, has layered a pervasive augmented reality network over the entire urban landscape, projecting a world of pristine order and consumer bliss to pacify the populace.</p>
-                <p>By hacking a prototype device onto your neural interface, you can see through this "Mirage" to the gritty, decaying, and dangerously real city beneath.</p>
-            </div>
-            <div class="info-section">
-                <h2>The Mission</h2>
-                <p>The game is a high-octane, third-person parkour adventure where your primary goal is to survive, expose the truth, and outrun the corporate enforcers known as "Sanitizers" who see you as a glitch in their system.</p>
-                <p>The core gameplay loop is a desperate, fluid dash through the city's vertical and horizontal spaces, where the environment itself is a shifting, deceptive opponent.</p>
-            </div>
-        </section>
+        <div id="gameScreen" class="screen">
+            <!-- Game screen content will be handled by the canvas -->
+        </div>
         
-        <section class="features">
-            <div class="feature-card">
-                <h3>Dual Reality System</h3>
-                <p>Switch between the pristine corporate "Mirage" and the gritty reality beneath. Use both views to navigate the city, with paths and obstacles changing between realities.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Fluid Parkour Mechanics</h3>
-                <p>Experience seamless movement with wall-running, precision jumps, zip-line transfers, and slide maneuvers. Chain moves together to maintain your "Flow" state for bonus points.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Dynamic Cityscape</h3>
-                <p>Neo-Kyoto is a living, breathing city with day-night cycles, changing weather, and evolving districts that react to your actions and notoriety level.</p>
-            </div>
-        </section>
-        
-        <section class="gameplay-section">
-            <h2>Gameplay Mechanics</h2>
-            <p>Movement is the soul of Neon Rush. It is designed to be fluid, intuitive, and immensely satisfying. Kaito's parkour is not just about running and jumping; it's an art form. You will fluidly chain together wall runs, precision jumps, zip-line transfers using grappling hooks on exposed beams, and slide under obstacles with a sense of weight and momentum that makes you feel like a force of nature.</p>
-            <p>Your hacking device allows for limited environmental manipulation, such as briefly disabling a flickering neon sign to create a dark hiding spot or overloading a power conduit to create a temporary electromagnetic pulse that stalls pursuing drones.</p>
-            
-            <div class="controls">
-                <div class="control-item">
-                    <div class="key">WASD</div>
-                    <p>Movement</p>
-                </div>
-                <div class="control-item">
-                    <div class="key">SPACE</div>
-                    <p>Jump / Vault</p>
-                </div>
-                <div class="control-item">
-                    <div class="key">SHIFT</div>
-                    <p>Sprint / Slide</p>
-                </div>
-                <div class="control-item">
-                    <div class="key">E</div>
-                    <p>Interact / Hack</p>
-                </div>
-                <div class="control-item">
-                    <div class="key">TAB</div>
-                    <p>Switch Reality View</p>
-                </div>
-            </div>
-        </section>
-        
-        <section class="character-section">
-            <div class="character">
-                <div class="character-img">K</div>
-                <h3>Kaito</h3>
-                <p>The protagonist, a former OmniGen employee who discovered the truth behind the Mirage. Agile and determined, he uses parkour to navigate the city and evade capture.</p>
-            </div>
-            <div class="character">
-                <div class="character-img">S</div>
-                <h3>Sanitizers</h3>
-                <p>OmniGen's corporate enforcers. They patrol the city, eliminating anyone who threatens to expose the truth. They become more aggressive as your exposure increases.</p>
-            </div>
-            <div class="character">
-                <div class="character-img">R</div>
-                <h3>Resistance</h3>
-                <p>A network of hackers and rebels working to bring down OmniGen. They provide safehouses, upgrades, and missions to help your cause.</p>
-            </div>
-        </section>
-        
-        <section class="upgrade-system">
-            <h2>Progression & Upgrade System</h2>
-            <p>Your progression is tied directly to your notoriety and your ability to manipulate the city's digital and physical layers. As you perform daring runs, evade Sanitizers, and shatter OmniGen's data-nodes to "leak" the truth to the underground net, your "Exposure Meter" fills.</p>
-            
-            <div class="upgrades">
-                <div class="upgrade">
-                    <h3>Hacking Device</h3>
-                    <p>Upgrade your neural interface to extend Mirage vision duration, enhance pulse abilities, or add new environmental manipulation modules.</p>
-                </div>
-                <div class="upgrade">
-                    <h3>Parkour Skills</h3>
-                    <p>Unlock advanced movement techniques like Rebound Jumps and Pulse Slides that allow you to access previously unreachable areas.</p>
-                </div>
-                <div class="upgrade">
-                    <h3>Stealth Enhancements</h3>
-                    <p>Improve your ability to evade detection with camouflage tech, sound-dampening footwear, and decoy projection systems.</p>
-                </div>
-            </div>
-        </section>
-        
-        <section class="cta-section">
-            <h2>Ready to Run?</h2>
-            <p>Experience the thrill of fluid parkour movement in a dystopian cyberpunk world. Uncover the truth, upgrade your gear, and become a legend in the shadows of Neo-Kyoto.</p>
-            <a href="#" class="cta-button">PLAY NOW</a>
-        </section>
-        
-        <footer>
-            <p>Neon Rush: Street Runner &copy; 2023 | A Cyberpunk Parkour Adventure</p>
-        </footer>
+        <div id="gameOverScreen" class="screen">
+            <h1>MISSION FAILED</h1>
+            <h2 id="finalScore">Score: 0</h2>
+            <p>The Sanitizers caught you, but the resistance will continue the fight. Ready to run again?</p>
+            <button class="button" id="restartButton">TRY AGAIN</button>
+        </div>
     </div>
+
+    <script>
+        // Game variables
+        let canvas, ctx;
+        let gameActive = false;
+        let score = 0;
+        let player;
+        let obstacles = [];
+        let collectibles = [];
+        let sanitizers = [];
+        let realityView = false;
+        let gameSpeed = 5;
+        let lastObstacleTime = 0;
+        let obstacleInterval = 1500;
+        let keys = {};
+        let touchControls = {};
+        
+        // Player object
+        const playerConfig = {
+            x: 100,
+            y: 300,
+            width: 40,
+            height: 60,
+            speed: 5,
+            jumpPower: 12,
+            isJumping: false,
+            isSliding: false,
+            velocityY: 0,
+            gravity: 0.5,
+            slideTime: 0,
+            maxSlideTime: 1000
+        };
+        
+        // Initialize the game
+        function init() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set canvas size to match window
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Start the game loop
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Resize canvas to fit window
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        // Set up keyboard and touch event listeners
+        function setupEventListeners() {
+            // Keyboard events
+            document.addEventListener('keydown', (e) => {
+                keys[e.key] = true;
+                
+                // Prevent arrow key scrolling
+                if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+                    e.preventDefault();
+                }
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                keys[e.key] = false;
+            });
+            
+            // Touch events for mobile controls
+            const controlButtons = [
+                'leftButton', 'rightButton', 'upButton', 'downButton',
+                'jumpButton', 'slideButton', 'hackButton'
+            ];
+            
+            controlButtons.forEach(buttonId => {
+                const button = document.getElementById(buttonId);
+                
+                button.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    touchControls[buttonId] = true;
+                    
+                    // Special handling for hack button (reality toggle)
+                    if (buttonId === 'hackButton') {
+                        realityView = !realityView;
+                    }
+                });
+                
+                button.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    touchControls[buttonId] = false;
+                });
+            });
+            
+            // UI button events
+            document.getElementById('startButton').addEventListener('click', startGame);
+            document.getElementById('restartButton').addEventListener('click', restartGame);
+            document.getElementById('realityToggle').addEventListener('click', () => {
+                realityView = !realityView;
+            });
+        }
+        
+        // Start the game
+        function startGame() {
+            gameActive = true;
+            score = 0;
+            player = {...playerConfig};
+            obstacles = [];
+            collectibles = [];
+            sanitizers = [];
+            lastObstacleTime = 0;
+            
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            
+            updateScore();
+        }
+        
+        // Restart the game
+        function restartGame() {
+            startGame();
+        }
+        
+        // Game over
+        function gameOver() {
+            gameActive = false;
+            document.getElementById('finalScore').textContent = `Score: ${score}`;
+            document.getElementById('gameOverScreen').style.display = 'flex';
+        }
+        
+        // Update score display
+        function updateScore() {
+            document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
+        }
+        
+        // Main game loop
+        function gameLoop() {
+            if (gameActive) {
+                update();
+                render();
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Update game state
+        function update() {
+            // Move player based on input
+            handleInput();
+            
+            // Apply gravity
+            if (player.isJumping) {
+                player.velocityY += player.gravity;
+                player.y += player.velocityY;
+                
+                // Check if player landed
+                if (player.y >= 300) {
+                    player.y = 300;
+                    player.isJumping = false;
+                    player.velocityY = 0;
+                }
+            }
+            
+            // Handle sliding
+            if (player.isSliding) {
+                player.slideTime += 16; // Assuming ~60fps
+                player.height = 30;
+                
+                if (player.slideTime >= player.maxSlideTime) {
+                    player.isSliding = false;
+                    player.slideTime = 0;
+                    player.height = 60;
+                }
+            } else {
+                player.height = 60;
+            }
+            
+            // Generate obstacles
+            const currentTime = Date.now();
+            if (currentTime - lastObstacleTime > obstacleInterval) {
+                generateObstacle();
+                lastObstacleTime = currentTime;
+                
+                // Increase game speed and decrease interval over time
+                gameSpeed += 0.05;
+                obstacleInterval = Math.max(500, obstacleInterval - 10);
+            }
+            
+            // Update obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= gameSpeed;
+                
+                // Remove obstacles that are off screen
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                    score += 10;
+                    updateScore();
+                }
+                
+                // Check for collisions
+                if (checkCollision(player, obstacles[i])) {
+                    gameOver();
+                }
+            }
+            
+            // Update collectibles
+            for (let i = collectibles.length - 1; i >= 0; i--) {
+                collectibles[i].x -= gameSpeed;
+                
+                // Remove collectibles that are off screen
+                if (collectibles[i].x + collectibles[i].width < 0) {
+                    collectibles.splice(i, 1);
+                }
+                
+                // Check for collection
+                if (checkCollision(player, collectibles[i])) {
+                    collectibles.splice(i, 1);
+                    score += 50;
+                    updateScore();
+                }
+            }
+            
+            // Update sanitizers
+            for (let i = sanitizers.length - 1; i >= 0; i--) {
+                sanitizers[i].x -= gameSpeed + 1; // Slightly faster than obstacles
+                
+                // Remove sanitizers that are off screen
+                if (sanitizers[i].x + sanitizers[i].width < 0) {
+                    sanitizers.splice(i, 1);
+                }
+                
+                // Check for collisions
+                if (checkCollision(player, sanitizers[i])) {
+                    gameOver();
+                }
+            }
+        }
+        
+        // Handle player input
+        function handleInput() {
+            // Keyboard controls
+            if (keys['ArrowLeft'] || keys['a'] || keys['A'] || touchControls['leftButton']) {
+                player.x = Math.max(50, player.x - player.speed);
+            }
+            
+            if (keys['ArrowRight'] || keys['d'] || keys['D'] || touchControls['rightButton']) {
+                player.x = Math.min(canvas.width - 50 - player.width, player.x + player.speed);
+            }
+            
+            if ((keys['ArrowUp'] || keys['w'] || keys['W'] || keys[' '] || touchControls['upButton'] || touchControls['jumpButton']) && !player.isJumping) {
+                player.isJumping = true;
+                player.velocityY = -player.jumpPower;
+            }
+            
+            if ((keys['ArrowDown'] || keys['s'] || keys['S'] || touchControls['downButton'] || touchControls['slideButton']) && !player.isSliding && !player.isJumping) {
+                player.isSliding = true;
+                player.slideTime = 0;
+            }
+            
+            if (keys['Tab'] || keys['e'] || keys['E'] || touchControls['hackButton']) {
+                // This is handled in the event listener to prevent rapid toggling
+            }
+        }
+        
+        // Generate a new obstacle
+        function generateObstacle() {
+            const obstacleTypes = ['barrier', 'gap', 'lowBarrier', 'sanitizer', 'dataNode'];
+            const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+            
+            switch(type) {
+                case 'barrier':
+                    obstacles.push({
+                        x: canvas.width,
+                        y: 240,
+                        width: 30,
+                        height: 120,
+                        type: 'barrier'
+                    });
+                    break;
+                    
+                case 'gap':
+                    // A gap requires the player to jump
+                    obstacles.push({
+                        x: canvas.width,
+                        y: 360,
+                        width: 80,
+                        height: 10,
+                        type: 'gap'
+                    });
+                    break;
+                    
+                case 'lowBarrier':
+                    obstacles.push({
+                        x: canvas.width,
+                        y: 300,
+                        width: 40,
+                        height: 60,
+                        type: 'lowBarrier'
+                    });
+                    break;
+                    
+                case 'sanitizer':
+                    sanitizers.push({
+                        x: canvas.width,
+                        y: 280,
+                        width: 40,
+                        height: 80,
+                        type: 'sanitizer'
+                    });
+                    break;
+                    
+                case 'dataNode':
+                    collectibles.push({
+                        x: canvas.width,
+                        y: 250,
+                        width: 30,
+                        height: 30,
+                        type: 'dataNode'
+                    });
+                    break;
+            }
+        }
+        
+        // Check for collision between two objects
+        function checkCollision(obj1, obj2) {
+            return obj1.x < obj2.x + obj2.width &&
+                   obj1.x + obj1.width > obj2.x &&
+                   obj1.y < obj2.y + obj2.height &&
+                   obj1.y + obj1.height > obj2.y;
+        }
+        
+        // Render the game
+        function render() {
+            // Clear canvas
+            ctx.fillStyle = realityView ? '#1a1a2e' : '#0f0c29';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background elements
+            drawBackground();
+            
+            // Draw player
+            drawPlayer();
+            
+            // Draw obstacles
+            obstacles.forEach(obstacle => {
+                drawObstacle(obstacle);
+            });
+            
+            // Draw collectibles
+            collectibles.forEach(collectible => {
+                drawCollectible(collectible);
+            });
+            
+            // Draw sanitizers
+            sanitizers.forEach(sanitizer => {
+                drawSanitizer(sanitizer);
+            });
+            
+            // Draw reality overlay if in reality view
+            if (realityView) {
+                drawRealityOverlay();
+            }
+        }
+        
+        // Draw background elements
+        function drawBackground() {
+            // Draw ground
+            ctx.fillStyle = realityView ? '#2d2d2d' : '#1a1a1a';
+            ctx.fillRect(0, 360, canvas.width, canvas.height - 360);
+            
+            // Draw road markings
+            ctx.strokeStyle = realityView ? '#555555' : '#3333ff';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([20, 20]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 380);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Draw buildings in the background
+            const buildingColors = realityView ? 
+                ['#2a2a2a', '#333333', '#3a3a3a'] : 
+                ['#1a1a3a', '#222244', '#2a2a4e'];
+                
+            for (let i = 0; i < 5; i++) {
+                const width = 60 + Math.random() * 40;
+                const height = 100 + Math.random() * 150;
+                const x = (i * 150) + (Date.now() * 0.01) % 150;
+                
+                ctx.fillStyle = buildingColors[i % buildingColors.length];
+                ctx.fillRect(x, 360 - height, width, height);
+                
+                // Draw windows
+                ctx.fillStyle = realityView ? '#1a1a1a' : '#33ccff';
+                for (let j = 0; j < 5; j++) {
+                    for (let k = 0; k < 3; k++) {
+                        if (Math.random() > 0.3) { // Randomly turn some windows off
+                            ctx.fillRect(
+                                x + 10 + (k * 15),
+                                360 - height + 20 + (j * 25),
+                                8, 15
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Draw the player character
+        function drawPlayer() {
+            ctx.fillStyle = realityView ? '#cccccc' : '#33ff99';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            
+            // Draw player details
+            ctx.fillStyle = realityView ? '#333333' : '#ff00cc';
+            ctx.fillRect(player.x + 5, player.y + 5, player.width - 10, 10);
+            
+            if (player.isSliding) {
+                ctx.fillStyle = realityView ? '#666666' : '#ffcc00';
+                ctx.fillRect(player.x, player.y + player.height - 5, player.width, 5);
+            }
+        }
+        
+        // Draw an obstacle
+        function drawObstacle(obstacle) {
+            switch(obstacle.type) {
+                case 'barrier':
+                    ctx.fillStyle = realityView ? '#555555' : '#ff6666';
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                    break;
+                    
+                case 'gap':
+                    ctx.fillStyle = realityView ? '#1a1a1a' : '#0f0c29';
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                    break;
+                    
+                case 'lowBarrier':
+                    ctx.fillStyle = realityView ? '#555555' : '#ffcc00';
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                    break;
+            }
+        }
+        
+        // Draw a collectible
+        function drawCollectible(collectible) {
+            ctx.fillStyle = realityView ? '#33ccff' : '#ff00cc';
+            ctx.beginPath();
+            ctx.arc(
+                collectible.x + collectible.width / 2,
+                collectible.y + collectible.height / 2,
+                collectible.width / 2,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            
+            // Add a glow effect
+            ctx.fillStyle = realityView ? 'rgba(51, 204, 255, 0.3)' : 'rgba(255, 0, 204, 0.3)';
+            ctx.beginPath();
+            ctx.arc(
+                collectible.x + collectible.width / 2,
+                collectible.y + collectible.height / 2,
+                collectible.width,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+        
+        // Draw a sanitizer
+        function drawSanitizer(sanitizer) {
+            ctx.fillStyle = realityView ? '#333333' : '#3333ff';
+            ctx.fillRect(sanitizer.x, sanitizer.y, sanitizer.width, sanitizer.height);
+            
+            // Draw details
+            ctx.fillStyle = realityView ? '#666666' : '#ff00cc';
+            ctx.fillRect(sanitizer.x + 5, sanitizer.y + 10, sanitizer.width - 10, 15);
+            
+            // Draw scanning beam
+            ctx.fillStyle = realityView ? 'rgba(100, 100, 100, 0.5)' : 'rgba(255, 0, 204, 0.3)';
+            ctx.fillRect(sanitizer.x - 50, sanitizer.y + 40, 50, 5);
+        }
+        
+        // Draw reality overlay
+        function drawRealityOverlay() {
+            // Add scan lines
+            ctx.fillStyle = 'rgba(0, 255, 255, 0.05)';
+            for (let i = 0; i < canvas.height; i += 4) {
+                ctx.fillRect(0, i, canvas.width, 1);
+            }
+            
+            // Add glitch effect
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+            ctx.fillRect(Math.random() * canvas.width, 0, 5, canvas.height);
+            
+            // Add data readout
+            ctx.fillStyle = '#00ffff';
+            ctx.font = '12px monospace';
+            ctx.fillText(`DATA_STREAM: ${score}`, 20, 30);
+            ctx.fillText(`REALITY_VIEW: ACTIVE`, 20, 50);
+            ctx.fillText(`OMNIGEN_SYS: BREACHED`, 20, 70);
+        }
+        
+        // Initialize the game when the page loads
+        window.addEventListener('load', init);
+    </script>
 </body>
 </html>
