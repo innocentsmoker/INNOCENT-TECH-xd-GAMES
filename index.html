@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Rush: Street Runner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(255, 0, 204, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0e0;
+            margin-bottom: 20px;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 30, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            box-shadow: 0 0 15px rgba(100, 100, 255, 0.2);
+        }
+        
+        .info-section {
+            flex: 1;
+            padding: 0 20px;
+        }
+        
+        .info-section h2 {
+            color: #ff00cc;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-bottom: 1px solid rgba(255, 0, 204, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .info-section p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #e0e0ff;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(20, 20, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .feature-card h3 {
+            color: #33ccff;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .feature-card p {
+            color: #c0c0ff;
+            line-height: 1.5;
+        }
+        
+        .gameplay-section {
+            background: rgba(10, 10, 40, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+        }
+        
+        .gameplay-section h2 {
+            text-align: center;
+            color: #ffcc00;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .control-item {
+            text-align: center;
+            margin: 10px;
+            padding: 15px;
+            background: rgba(30, 30, 70, 0.8);
+            border-radius: 8px;
+            min-width: 150px;
+        }
+        
+        .control-item .key {
+            display: inline-block;
+            background: #333;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            border: 1px solid #555;
+        }
+        
+        .character-section {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        
+        .character {
+            text-align: center;
+            margin: 15px;
+            padding: 20px;
+            background: rgba(20, 20, 50, 0.7);
+            border-radius: 10px;
+            width: 250px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+        }
+        
+        .character-img {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #ff00cc, #3333ff);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .character h3 {
+            color: #33ff99;
+            margin-bottom: 10px;
+        }
+        
+        .upgrade-system {
+            background: rgba(10, 10, 40, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+        }
+        
+        .upgrade-system h2 {
+            text-align: center;
+            color: #ff6666;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .upgrades {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .upgrade {
+            background: rgba(30, 30, 70, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ff00cc;
+        }
+        
+        .upgrade h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .cta-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 30, 0.6);
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(90deg, #ff00cc, #3333ff);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 0, 204, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 0, 204, 0.6);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 40px;
+            color: #a0a0e0;
+        }
+        
+        @media (max-width: 768px) {
+            .game-info {
+                flex-direction: column;
+            }
+            
+            .info-section {
+                margin-bottom: 20px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NEON RUSH</h1>
+            <p class="subtitle">A Cyberpunk Street Runner Experience</p>
+        </header>
+        
+        <section class="game-info">
+            <div class="info-section">
+                <h2>The World</h2>
+                <p>In the sprawling, rain-slicked metropolis of Neo-Kyoto, you are Kaito, a disillusioned corporate drone who discovers a secret: the city is a lie. A powerful corporation, OmniGen, has layered a pervasive augmented reality network over the entire urban landscape, projecting a world of pristine order and consumer bliss to pacify the populace.</p>
+                <p>By hacking a prototype device onto your neural interface, you can see through this "Mirage" to the gritty, decaying, and dangerously real city beneath.</p>
+            </div>
+            <div class="info-section">
+                <h2>The Mission</h2>
+                <p>The game is a high-octane, third-person parkour adventure where your primary goal is to survive, expose the truth, and outrun the corporate enforcers known as "Sanitizers" who see you as a glitch in their system.</p>
+                <p>The core gameplay loop is a desperate, fluid dash through the city's vertical and horizontal spaces, where the environment itself is a shifting, deceptive opponent.</p>
+            </div>
+        </section>
+        
+        <section class="features">
+            <div class="feature-card">
+                <h3>Dual Reality System</h3>
+                <p>Switch between the pristine corporate "Mirage" and the gritty reality beneath. Use both views to navigate the city, with paths and obstacles changing between realities.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Fluid Parkour Mechanics</h3>
+                <p>Experience seamless movement with wall-running, precision jumps, zip-line transfers, and slide maneuvers. Chain moves together to maintain your "Flow" state for bonus points.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Dynamic Cityscape</h3>
+                <p>Neo-Kyoto is a living, breathing city with day-night cycles, changing weather, and evolving districts that react to your actions and notoriety level.</p>
+            </div>
+        </section>
+        
+        <section class="gameplay-section">
+            <h2>Gameplay Mechanics</h2>
+            <p>Movement is the soul of Neon Rush. It is designed to be fluid, intuitive, and immensely satisfying. Kaito's parkour is not just about running and jumping; it's an art form. You will fluidly chain together wall runs, precision jumps, zip-line transfers using grappling hooks on exposed beams, and slide under obstacles with a sense of weight and momentum that makes you feel like a force of nature.</p>
+            <p>Your hacking device allows for limited environmental manipulation, such as briefly disabling a flickering neon sign to create a dark hiding spot or overloading a power conduit to create a temporary electromagnetic pulse that stalls pursuing drones.</p>
+            
+            <div class="controls">
+                <div class="control-item">
+                    <div class="key">WASD</div>
+                    <p>Movement</p>
+                </div>
+                <div class="control-item">
+                    <div class="key">SPACE</div>
+                    <p>Jump / Vault</p>
+                </div>
+                <div class="control-item">
+                    <div class="key">SHIFT</div>
+                    <p>Sprint / Slide</p>
+                </div>
+                <div class="control-item">
+                    <div class="key">E</div>
+                    <p>Interact / Hack</p>
+                </div>
+                <div class="control-item">
+                    <div class="key">TAB</div>
+                    <p>Switch Reality View</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="character-section">
+            <div class="character">
+                <div class="character-img">K</div>
+                <h3>Kaito</h3>
+                <p>The protagonist, a former OmniGen employee who discovered the truth behind the Mirage. Agile and determined, he uses parkour to navigate the city and evade capture.</p>
+            </div>
+            <div class="character">
+                <div class="character-img">S</div>
+                <h3>Sanitizers</h3>
+                <p>OmniGen's corporate enforcers. They patrol the city, eliminating anyone who threatens to expose the truth. They become more aggressive as your exposure increases.</p>
+            </div>
+            <div class="character">
+                <div class="character-img">R</div>
+                <h3>Resistance</h3>
+                <p>A network of hackers and rebels working to bring down OmniGen. They provide safehouses, upgrades, and missions to help your cause.</p>
+            </div>
+        </section>
+        
+        <section class="upgrade-system">
+            <h2>Progression & Upgrade System</h2>
+            <p>Your progression is tied directly to your notoriety and your ability to manipulate the city's digital and physical layers. As you perform daring runs, evade Sanitizers, and shatter OmniGen's data-nodes to "leak" the truth to the underground net, your "Exposure Meter" fills.</p>
+            
+            <div class="upgrades">
+                <div class="upgrade">
+                    <h3>Hacking Device</h3>
+                    <p>Upgrade your neural interface to extend Mirage vision duration, enhance pulse abilities, or add new environmental manipulation modules.</p>
+                </div>
+                <div class="upgrade">
+                    <h3>Parkour Skills</h3>
+                    <p>Unlock advanced movement techniques like Rebound Jumps and Pulse Slides that allow you to access previously unreachable areas.</p>
+                </div>
+                <div class="upgrade">
+                    <h3>Stealth Enhancements</h3>
+                    <p>Improve your ability to evade detection with camouflage tech, sound-dampening footwear, and decoy projection systems.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="cta-section">
+            <h2>Ready to Run?</h2>
+            <p>Experience the thrill of fluid parkour movement in a dystopian cyberpunk world. Uncover the truth, upgrade your gear, and become a legend in the shadows of Neo-Kyoto.</p>
+            <a href="#" class="cta-button">PLAY NOW</a>
+        </section>
+        
+        <footer>
+            <p>Neon Rush: Street Runner &copy; 2023 | A Cyberpunk Parkour Adventure</p>
+        </footer>
+    </div>
+</body>
+</html>
